@@ -1,0 +1,146 @@
+/**
+ * Metronome
+ */
+const minTempo = 40;//BPM
+const maxTempo = 250;//BPM
+const numBeatsPerBar = 4;
+
+const noteLength = 0.05;//Seconds
+const scheduleInterval = 25.0;//ms. How often the scheduling is called.
+const scheduleAheadTime = 0.1;//Seconds
+
+enum Pitch { HIGH, MID, LOW };
+
+export default class Metronome {
+
+    private tempo: number; //beats per minute (BPM)
+    private isPlaying: boolean = false;
+    private currentBeat: number = 0;
+    private audioContext: AudioContext;
+    private audioLoopTimerHandle: number;
+
+    constructor(tempo: number) {
+        this.audioContext = new AudioContext();
+        this.setTempo(tempo);
+    }
+
+    play(): void {
+        if (!this.isPlaying) {
+            this.isPlaying = true;
+            this.audioLoop();
+        }
+    }
+
+    pause(): void {
+        if (this.isPlaying) {
+            this.stopAudioLoop();
+            this.isPlaying = false;
+        }
+    }
+
+    toggle(): boolean {
+        if (this.isPlaying) {
+            this.pause();
+        } else {
+            this.play();
+        }
+        return this.isPlaying;
+    }
+
+    validateTempo(tempo: number): boolean {
+        if (isNaN(tempo)) {
+            //Change to error state
+            console.log('Not a number!')
+            return false;
+        }
+
+        tempo = Number(tempo);
+
+        if (tempo < minTempo) {
+            //Signal error
+            console.log('Below min tempo')
+            return false;
+        }
+
+        if (tempo > maxTempo) {
+            //Signal error
+            console.log('Above max tempo')
+            return false;
+        }
+
+        return true;
+    }
+
+    setTempo(tempo: number): void {
+
+        if (this.tempo === tempo) {
+            //Do nothing if it is the same
+            return;
+        }
+
+        if (!this.validateTempo(tempo)) {
+            return;
+        }
+
+        this.tempo = Number(tempo);
+
+        console.log('New metronome tempo:', tempo);
+    }
+
+    private stopAudioLoop() {
+        clearInterval(this.audioLoopTimerHandle)
+    }
+
+    private audioLoop() {
+
+        let nextNoteTime = this.audioContext.currentTime;
+        let next4thNote = 0;
+
+        //The scheduler
+        this.audioLoopTimerHandle = setInterval(() => {
+
+            if (!this.isPlaying) {
+                return;
+            }
+
+            while (nextNoteTime < this.audioContext.currentTime + scheduleAheadTime) {
+
+                this.scheduleTone(nextNoteTime, next4thNote % numBeatsPerBar ? Pitch.MID : Pitch.HIGH);
+
+                let secondsPerBeat = 60.0 / this.tempo;
+                nextNoteTime += secondsPerBeat;
+                next4thNote = (next4thNote + 1) % numBeatsPerBar;
+            }
+
+        }, scheduleInterval)
+    }
+
+    private scheduleTone(startTime: number, pitch: Pitch): void {
+
+        let osc = this.audioContext.createOscillator();
+        osc.connect(this.audioContext.destination);
+
+        let frequency = 0;
+
+        switch (pitch) {
+            case Pitch.HIGH:
+                frequency = 880;
+                break;
+            case Pitch.MID:
+                frequency = 440;
+                break;
+            case Pitch.LOW:
+                frequency = 220;
+                break;
+            default:
+                console.log('Invalid pitch')
+                frequency = 220;
+                break;
+        }
+
+        osc.frequency.value = frequency;
+        osc.start(startTime);
+        osc.stop(startTime + noteLength);
+    }
+}
+

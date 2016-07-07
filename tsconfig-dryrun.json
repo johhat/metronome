@@ -1,0 +1,15 @@
+//This is used by the vscode build task
+{
+    "compilerOptions": {
+        "target": "es5",
+        "module": "commonjs",
+        "noImplicitAny": true,
+        "noImplicitReturns": true,
+        "sourceMap": true,
+        "noEmit": true
+    },
+    "exclude": [
+        "build",
+        "node_modules"
+    ]    
+}
