@@ -42,3 +42,34 @@ browserifyInstance.on('update', bundle)
 
 //Initial bundling
 bundle()
+
+//Copy files from node modules
+copyFile('node_modules/normalize.css/normalize.css','css/normalize.css',(error)=>{})
+
+//Utility functions below here
+function copyFile(source, target, cb) {
+  var cbCalled = false;
+
+  var rd = fs.createReadStream(source);
+  rd.on("error", function(err) {
+    console.log('Error during copy. Read stream.',err.toString())
+    done(err);
+  });
+  var wr = fs.createWriteStream(target);
+  wr.on("error", function(err) {
+    console.log('Error during copy. Write stream.',err.toString())
+    done(err);
+  });
+  wr.on("close", function(ex) {
+    console.log('Copy of', source, 'completed')
+    done();
+  });
+  rd.pipe(wr);
+
+  function done(err) {
+    if (!cbCalled) {
+      cb(err);
+      cbCalled = true;
+    }
+  }
+}
