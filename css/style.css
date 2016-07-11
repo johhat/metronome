@@ -59,6 +59,8 @@ body {
     border-radius: 4px;
 
     margin-top: 2px;
+
+    transition: all 0.3s ease;
 }
 
 .btn-small {
@@ -163,6 +165,8 @@ input[type="button"] .btn-block {
     font-size: 0.7em;
     color: #737373;
     text-align: left;
+
+    transition: all 0.3s ease;
 }
 
 label.has-error {
@@ -239,7 +243,9 @@ input.has-error:hover {
     padding: 0 0 0 0;
 
     width: 100%;
-    overflow: visible;    
+    overflow: visible;
+
+    transition: all 0.3s ease;    
 }
 
 input[type=number]::-webkit-inner-spin-button, 
