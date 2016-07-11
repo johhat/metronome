@@ -1,5 +1,6 @@
 //Source: https://en.wikipedia.org/wiki/Tempo
 //Note: Several intervals overlap. Some overlap completely.
+//Sorted in ascending order.
 const tempoLabels = [
     {
         range: [0, 24],
