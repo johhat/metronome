@@ -1,6 +1,22 @@
 ## Live demo
 Please follow [this link][live-demo].
 
+## Developing
+
+After cloning the repo run 
+```
+npm install
+```
+in the terminal to install dependencies.
+
+Then use 
+```
+npm start
+```
+to start a dev server. The start script starts a browsersync server with watching, such that any changes in the .ts-files triggers a reloading of the app.
+
+*Note: Node.js must be installed for this to work. The app was developed using node version 6.3.0 on Ubuntu.*
+
 ## Motivation
 For fun and learning. Amongst other things, to learn some [typescript].
 
