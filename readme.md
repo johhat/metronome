@@ -21,7 +21,7 @@ to start a dev server. The start script starts a browsersync server with watchin
 For fun and learning. Amongst other things, to learn some [typescript].
 
 ## Styling
-The styling is basically a lightweight copy of the great CSS framework [Twitter Bootstrap][bootstrap].
+The styling is basically a lightweight copy of a few elements from the CSS framework [Twitter Bootstrap][bootstrap].
 
 ## Contributions
 Please submit issues, requests, pull requests etc. I am grateful for any input you might have. In addition, feel free to fork this repo. As you can see, I've chosen the MIT license - meaning you can basically do whatever you like with this repo with no strings attached.
