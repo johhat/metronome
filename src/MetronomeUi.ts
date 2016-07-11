@@ -4,9 +4,10 @@
 import Metronome from './Metronome';
 import Tapper from './Tapper';
 import WhilePressedBtn from './WhilePressedBtn'
+import InputDisplay from './InputDisplay'
 
 const defaultTempo = 120; //BPM
-const inputReactDelay = 500;//ms.
+const defaultHelpText = 'Tempo in beats per minute (BPM):'
 
 //These should be imported from Metronome module
 const minTempo = 40;
@@ -19,10 +20,6 @@ export default class MetronomeUi {
 
     private isPlaying: boolean = false;
     private displayValue: number = defaultTempo;
-    private displayValueIsValid: boolean = true;
-    private tapBtnLastPressedTime: number = 0;//Dummy value for 'not yet pressed'
-
-    private inputTimerId: number = 0;
 
     private enterIsPressed: boolean = false;
     private spaceIsPressed: boolean = false;
@@ -32,20 +29,34 @@ export default class MetronomeUi {
 
     private plussBtn: WhilePressedBtn;
     private minusBtn: WhilePressedBtn;
+    private inputDisplay: InputDisplay;
 
     constructor(private playPauseBtn: HTMLInputElement,
         private tapBtn: HTMLInputElement,
         plussBtn: HTMLInputElement,
         minusBtn: HTMLInputElement,
         private resetBtn: HTMLInputElement,
-        private inputDisplay: HTMLInputElement) {
+        inputDisplay: HTMLInputElement,
+        inputDisplayLabel: HTMLLabelElement) {
 
         this.metronome = new Metronome(defaultTempo);
         this.tapper = new Tapper();
-        this.setDisplayValue(defaultTempo);
 
         this.plussBtn = new WhilePressedBtn(plussBtn, () => { this.incrementDisplayValue() });
         this.minusBtn = new WhilePressedBtn(minusBtn, () => { this.decrementDisplayValue() });
+        this.inputDisplay = new InputDisplay(inputDisplay, inputDisplayLabel, defaultTempo, defaultHelpText,
+            (value: number) => {
+                //Validator function
+                return this.metronome.validateTempo(value)
+            },
+            (value: number) => {
+                //Handle new valid value
+                this.displayValue = value;
+                this.setMetronomeTempo(value);
+            }
+        );
+
+        this.setDisplayValue(defaultTempo);
 
         //Set event handlers
         playPauseBtn.addEventListener('click', () => {
@@ -66,10 +77,6 @@ export default class MetronomeUi {
 
         document.addEventListener('keyup', (event) => {
             this.handleKeyUp(event);
-        });
-
-        inputDisplay.addEventListener('input', (event) => {
-            this.handleDisplayInputEvent(event);
         });
     }
 
@@ -92,9 +99,13 @@ export default class MetronomeUi {
 
         let newValue = this.displayValue + 1;
 
-        if (!this.metronome.validateTempo(newValue)) {
-            if (newValue>maxTempo) this.setDisplayValue(maxTempo)
-            if (newValue<minTempo) this.setDisplayValue(minTempo)
+        let {valid, error} = this.metronome.validateTempo(newValue)
+
+        if (!valid) {
+            if (newValue > maxTempo) this.setDisplayValue(maxTempo)
+            if (newValue < minTempo) this.setDisplayValue(minTempo)
+            this.inputDisplay.setTimedError(error, 2000)
+            this.plussBtn.setTimedError(2000)
             return;
         }
 
@@ -104,9 +115,13 @@ export default class MetronomeUi {
     private decrementDisplayValue(): void {
         let newValue = this.displayValue - 1;
 
-        if (!this.metronome.validateTempo(newValue)) {
-            if (newValue<minTempo) this.setDisplayValue(minTempo)
-            if (newValue>maxTempo) this.setDisplayValue(maxTempo)
+        let {valid, error} = this.metronome.validateTempo(newValue)
+
+        if (!valid) {
+            if (newValue < minTempo) this.setDisplayValue(minTempo)
+            if (newValue > maxTempo) this.setDisplayValue(maxTempo)
+            this.inputDisplay.setTimedError(error, 2000)
+            this.minusBtn.setTimedError(2000)
             return;
         }
 
@@ -117,16 +132,19 @@ export default class MetronomeUi {
         this.setDisplayValue(defaultTempo);
         this.metronome.pause();
         this.metronome.setTempo(defaultTempo);
+        this.tapper.reset();
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
         const keyName = event.key;
 
         if (keyName === 'ArrowUp' || keyName === 'ArrowRight') {
+            event.preventDefault();
             this.incrementDisplayValue();
         }
 
         if (keyName === 'ArrowDown' || keyName === 'ArrowLeft') {
+            event.preventDefault();
             this.decrementDisplayValue();
         }
 
@@ -161,49 +179,16 @@ export default class MetronomeUi {
         }
     }
 
-    private handleDisplayInputEvent(event: Event) {
-        clearTimeout(this.inputTimerId);
-
-        this.inputTimerId = setTimeout(() => {
-            let value = this.inputDisplay.value;
-
-            if (value.toString().length < 1) {
-                this.setErrorMessage('The entered value has too few digits.');
-                return;
-            }
-
-            if (isNaN(Number(value))) {
-                this.setErrorMessage('The entered value is not a number. Please enter a number')
-                return;
-            }
-
-            let valueAsNumber = Number(value)
-
-            //TODO: Get limit values from metronome module 
-            if (valueAsNumber < 40) {
-                this.setErrorMessage('The value is too low. Please enter a number in the range 40 to 250')
-                return;
-            }
-
-            if (valueAsNumber > 250) {
-                this.setErrorMessage('The value is too high. Please enter a number in the range 40 to 250')
-                return;
-            }
-
-            this.setDisplayValue(valueAsNumber);
-
-        }, inputReactDelay)
-    }
-
-    private setErrorMessage(message: string): void {
-        console.log(message);
-    }
-
     private setDisplayValue(value: number): void {
-        this.displayValue = Math.round(value * 100) / 100;
-        this.inputDisplay.value = this.displayValue.toString();
 
-        if (this.metronome.validateTempo(value)) {
+        value = Math.round(value * 100) / 100;
+
+        this.displayValue = value;
+        this.inputDisplay.setValue(value)
+
+        let {valid} = this.metronome.validateTempo(value)
+
+        if (valid) {
             this.setMetronomeTempo(value);
         }
     }

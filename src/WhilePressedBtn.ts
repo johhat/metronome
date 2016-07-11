@@ -9,6 +9,8 @@ const keyDownRepeatInterval = 30; //ms. Same as Chrome.
 export default class WhilePressedBtn {
 
     private btn: HTMLInputElement;
+    private errorTimerId: number = 0;
+
     private mouseIsPressed: boolean = false;
     private mouseDownTimerHandle: number = 0;
     private mouseDownHandlerFunction: () => void;
@@ -31,6 +33,16 @@ export default class WhilePressedBtn {
             this.mouseIsPressed = false;
             clearTimeout(this.mouseDownTimerHandle);
         });
+    }
+
+    setTimedError(duration: number): void {
+        clearTimeout(this.errorTimerId)
+
+        this.btn.classList.add('has-error')
+
+        this.errorTimerId = setTimeout(() => {
+            this.btn.classList.remove('has-error')
+        }, duration)
     }
 
     private mouseDownLoop(): void {

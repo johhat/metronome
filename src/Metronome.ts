@@ -48,11 +48,10 @@ export default class Metronome {
         return this.isPlaying;
     }
 
-    validateTempo(tempo: number): boolean {
+    validateTempo(tempo: number): { valid: boolean, error: string } {
         if (isNaN(tempo)) {
             //Change to error state
-            console.log('Not a number!')
-            return false;
+            return { valid: false, error: 'You must enter a number' };
         }
 
         tempo = Number(tempo);
@@ -60,16 +59,16 @@ export default class Metronome {
         if (tempo < minTempo) {
             //Signal error
             console.log('Below min tempo')
-            return false;
+            return { valid: false, error: 'Minimum tempo is ' + minTempo };
         }
 
         if (tempo > maxTempo) {
             //Signal error
             console.log('Above max tempo')
-            return false;
+            return { valid: false, error: 'Max tempo is ' + maxTempo };
         }
 
-        return true;
+        return { valid: true, error: '' };
     }
 
     setTempo(tempo: number): void {
@@ -79,7 +78,9 @@ export default class Metronome {
             return;
         }
 
-        if (!this.validateTempo(tempo)) {
+        let {valid} = this.validateTempo(tempo)
+
+        if (!valid) {
             return;
         }
 

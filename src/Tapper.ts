@@ -17,9 +17,7 @@ export default class Tapper {
         clearTimeout(this.timerHandle)
 
         this.timerHandle = setTimeout(() => {
-            this.numValuesAveraged = 0;
-            this.averageInterval = 0;
-            this.previousTap = 0;
+            this.reset()
         }, resetAfter)
 
         if (!this.previousTap) {
@@ -46,5 +44,11 @@ export default class Tapper {
             averageTempo: Math.round(bpm * 100) / 100,
             numValuesAveraged: this.numValuesAveraged
         };
+    }
+
+    reset(): void {
+        this.previousTap = 0;
+        this.numValuesAveraged = 0;
+        this.averageInterval = 0;
     }
 }
