@@ -20,7 +20,8 @@ export default class Metronome {
     private audioLoopTimerHandle: number;
 
     constructor(tempo: number) {
-        this.audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        //Safari needs prefix webkitAudioContext
+        this.audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)()
         this.setTempo(tempo);
     }
 
