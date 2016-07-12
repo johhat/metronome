@@ -15,7 +15,6 @@ export default class Metronome {
 
     private tempo: number; // beats per minute (BPM)
     private isPlaying: boolean = false;
-    private currentBeat: number = 0;
     private audioContext: AudioContext;
     private audioLoopTimerHandle: number;
 
