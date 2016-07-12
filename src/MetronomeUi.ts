@@ -13,6 +13,17 @@ const defaultHelpText = 'Tempo in beats per minute (BPM):'
 const minTempo = 40;
 const maxTempo = 250;
 
+let hasLocalStorage = (() => {
+    let test = 'metronome-test-string';
+    try {
+        localStorage.setItem(test, test);
+        localStorage.removeItem(test);
+        return true;
+    } catch (e) {
+        return false;
+    }
+})()
+
 enum KeyCodes { SPACE = 32 };
 enum MouseCodes { LEFT = 1 };
 
@@ -56,7 +67,7 @@ export default class MetronomeUi {
             }
         );
 
-        this.setDisplayValue(defaultTempo);
+        this.setDisplayValue(this.getTempoFromStorage());
 
         //Set event handlers
         playPauseBtn.addEventListener('click', () => {
@@ -133,6 +144,7 @@ export default class MetronomeUi {
         this.metronome.pause();
         this.metronome.setTempo(defaultTempo);
         this.tapper.reset();
+        localStorage.clear()
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
@@ -190,10 +202,35 @@ export default class MetronomeUi {
 
         if (valid) {
             this.setMetronomeTempo(value);
+            this.setTempoInStorage(value)
         }
     }
 
     private setMetronomeTempo(tempo: number): void {
         this.metronome.setTempo(tempo);
+    }
+
+    private getTempoFromStorage(): number {
+
+        if (!hasLocalStorage) return defaultTempo
+
+        let item = localStorage.getItem('tempo')
+
+        if (!item) {
+            localStorage.setItem('tempo', defaultTempo.toString())
+            return defaultTempo
+        }
+
+        if (isNaN(item)) {
+            localStorage.setItem('tempo', defaultTempo.toString())
+            return defaultTempo
+        }
+
+        return Number(item)
+    }
+
+    private setTempoInStorage(tempo: number) {
+        if (!hasLocalStorage) return
+        localStorage.setItem('tempo', tempo.toString())
     }
 }
