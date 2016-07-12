@@ -3,11 +3,11 @@
  */
 import Metronome from './Metronome';
 import Tapper from './Tapper';
-import WhilePressedBtn from './WhilePressedBtn'
-import InputDisplay from './InputDisplay'
+import WhilePressedBtn from './WhilePressedBtn';
+import InputDisplay from './InputDisplay';
 
-const defaultTempo = 120; //BPM
-const defaultHelpText = 'Tempo in beats per minute (BPM):'
+const defaultTempo = 120; // BPM
+const defaultHelpText = 'Tempo in beats per minute (BPM):';
 
 let hasLocalStorage = (() => {
     let test = 'metronome-test-string';
@@ -18,7 +18,7 @@ let hasLocalStorage = (() => {
     } catch (e) {
         return false;
     }
-})()
+})();
 
 enum KeyCodes { SPACE = 32 };
 enum MouseCodes { LEFT = 1 };
@@ -32,10 +32,10 @@ export default class MetronomeUi {
     private spaceIsPressed: boolean = false;
 
     private metronome: Metronome;
-    private tapper: Tapper
+    private tapper: Tapper;
 
-    private minTempo : number
-    private maxTempo : number
+    private minTempo: number;
+    private maxTempo: number;
 
     private plussBtn: WhilePressedBtn;
     private minusBtn: WhilePressedBtn;
@@ -56,15 +56,15 @@ export default class MetronomeUi {
 
         this.tapper = new Tapper();
 
-        this.plussBtn = new WhilePressedBtn(plussBtn, () => { this.incrementDisplayValue() });
-        this.minusBtn = new WhilePressedBtn(minusBtn, () => { this.decrementDisplayValue() });
+        this.plussBtn = new WhilePressedBtn(plussBtn, () => { this.incrementDisplayValue(); });
+        this.minusBtn = new WhilePressedBtn(minusBtn, () => { this.decrementDisplayValue(); });
         this.inputDisplay = new InputDisplay(inputDisplay, inputDisplayLabel, defaultTempo, defaultHelpText,
             (value: number) => {
-                //Validator function
-                return this.metronome.validateTempo(value)
+                // Validator function
+                return this.metronome.validateTempo(value);
             },
             (value: number) => {
-                //Handle new valid value
+                // Handle new valid value
                 this.displayValue = value;
                 this.setMetronomeTempo(value);
             }
@@ -72,7 +72,7 @@ export default class MetronomeUi {
 
         this.setDisplayValue(this.getTempoFromStorage());
 
-        //Set event handlers
+        // Set event handlers
         playPauseBtn.addEventListener('click', () => {
             this.togglePlayPause();
         });
@@ -101,8 +101,8 @@ export default class MetronomeUi {
             return;
         }
 
-        console.log('Num values averaged:', numValuesAveraged)
-        this.setDisplayValue(averageTempo)
+        console.log('Num values averaged:', numValuesAveraged);
+        this.setDisplayValue(averageTempo);
     }
 
     private togglePlayPause(): void {
@@ -113,13 +113,13 @@ export default class MetronomeUi {
 
         let newValue = this.displayValue + 1;
 
-        let {valid, error} = this.metronome.validateTempo(newValue)
+        let {valid, error} = this.metronome.validateTempo(newValue);
 
         if (!valid) {
-            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo)
-            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo)
-            this.inputDisplay.setTimedError(error, 2000)
-            this.plussBtn.setTimedError(2000)
+            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo);
+            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo);
+            this.inputDisplay.setTimedError(error, 2000);
+            this.plussBtn.setTimedError(2000);
             return;
         }
 
@@ -129,13 +129,13 @@ export default class MetronomeUi {
     private decrementDisplayValue(): void {
         let newValue = this.displayValue - 1;
 
-        let {valid, error} = this.metronome.validateTempo(newValue)
+        let {valid, error} = this.metronome.validateTempo(newValue);
 
         if (!valid) {
-            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo)
-            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo)
-            this.inputDisplay.setTimedError(error, 2000)
-            this.minusBtn.setTimedError(2000)
+            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo);
+            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo);
+            this.inputDisplay.setTimedError(error, 2000);
+            this.minusBtn.setTimedError(2000);
             return;
         }
 
@@ -147,7 +147,7 @@ export default class MetronomeUi {
         this.metronome.pause();
         this.metronome.setTempo(defaultTempo);
         this.tapper.reset();
-        localStorage.clear()
+        localStorage.clear();
     }
 
     private handleKeyDown(event: KeyboardEvent): void {
@@ -164,7 +164,7 @@ export default class MetronomeUi {
         }
 
         if (keyName === 'Enter') {
-            //May not be very intuitive. Eg. enter on reset button will not "press" reset
+            // May not be very intuitive. Eg. enter on reset button will not "press" reset
             event.preventDefault();
 
             if (!this.enterIsPressed) {
@@ -174,7 +174,7 @@ export default class MetronomeUi {
         }
 
         if (event.keyCode === KeyCodes.SPACE) {
-            //May not be very intuitive. Eg. space on reset button will not "press" reset
+            // May not be very intuitive. Eg. space on reset button will not "press" reset
             event.preventDefault();
 
             if (!this.spaceIsPressed) {
@@ -199,13 +199,13 @@ export default class MetronomeUi {
         value = Math.round(value * 100) / 100;
 
         this.displayValue = value;
-        this.inputDisplay.setValue(value)
+        this.inputDisplay.setValue(value);
 
-        let {valid} = this.metronome.validateTempo(value)
+        let {valid} = this.metronome.validateTempo(value);
 
         if (valid) {
             this.setMetronomeTempo(value);
-            this.setTempoInStorage(value)
+            this.setTempoInStorage(value);
         }
     }
 
@@ -215,25 +215,25 @@ export default class MetronomeUi {
 
     private getTempoFromStorage(): number {
 
-        if (!hasLocalStorage) return defaultTempo
+        if (!hasLocalStorage) return defaultTempo;
 
-        let item = localStorage.getItem('tempo')
+        let item = localStorage.getItem('tempo');
 
         if (!item) {
-            localStorage.setItem('tempo', defaultTempo.toString())
-            return defaultTempo
+            localStorage.setItem('tempo', defaultTempo.toString());
+            return defaultTempo;
         }
 
         if (isNaN(item)) {
-            localStorage.setItem('tempo', defaultTempo.toString())
-            return defaultTempo
+            localStorage.setItem('tempo', defaultTempo.toString());
+            return defaultTempo;
         }
 
-        return Number(item)
+        return Number(item);
     }
 
     private setTempoInStorage(tempo: number) {
-        if (!hasLocalStorage) return
-        localStorage.setItem('tempo', tempo.toString())
+        if (!hasLocalStorage) return;
+        localStorage.setItem('tempo', tempo.toString());
     }
 }

@@ -1,7 +1,7 @@
 /**
  * InputDisplay
  */
-const inputReactDelay = 500;//ms.
+const inputReactDelay = 500; // ms.
 enum State { OK, WARNING, ERROR }
 
 export default class InputDisplay {
@@ -35,42 +35,42 @@ export default class InputDisplay {
     }
 
     setTimedError(message: string, duration: number) {
-        clearTimeout(this.messageTimerId)
+        clearTimeout(this.messageTimerId);
 
-        this.setState(State.ERROR)
-        this.setErrorMessage(message)
+        this.setState(State.ERROR);
+        this.setErrorMessage(message);
 
         this.messageTimerId = setTimeout(() => {
-            //Go back to state corresponding to current display value
-            this.handleNewValue(this.inputDisplay.value)
-        }, duration)
+            // Go back to state corresponding to current display value
+            this.handleNewValue(this.inputDisplay.value);
+        }, duration);
     }
 
     private handleNewValue(value: string): boolean {
         if (value.toString().length < 2) {
             this.setErrorMessage('The value must have at least two digits.');
-            this.setState(State.WARNING)
+            this.setState(State.WARNING);
             return false;
         }
 
         if (isNaN(Number(value))) {
-            this.setErrorMessage('The entered value is not a number. Please enter a number')
-            this.setState(State.WARNING)
+            this.setErrorMessage('The entered value is not a number. Please enter a number');
+            this.setState(State.WARNING);
             return false;
         }
 
-        let valueAsNumber = Number(value)
+        let valueAsNumber = Number(value);
 
         let {valid, error} = this.validator(valueAsNumber);
 
         if (!valid) {
-            this.setErrorMessage(error)
-            this.setState(State.ERROR)
+            this.setErrorMessage(error);
+            this.setState(State.ERROR);
             return false;
         }
 
-        this.setState(State.OK)
-        this.setErrorMessage(this.defaultHelpText)
+        this.setState(State.OK);
+        this.setErrorMessage(this.defaultHelpText);
 
         return true;
     }
@@ -83,27 +83,27 @@ export default class InputDisplay {
             let value = this.inputDisplay.value;
 
             if (!this.handleNewValue(value)) {
-                return
+                return;
             }
 
-            this.onNewValidValue(Number(value))
+            this.onNewValidValue(Number(value));
 
-        }, inputReactDelay)
+        }, inputReactDelay);
     }
 
     private setState(nextState: State) {
-        //Set CSS classes corresponding to the element state
-        let currentStateClass = this.getStateClass(this.state)
+        // Set CSS classes corresponding to the element state
+        let currentStateClass = this.getStateClass(this.state);
         let nextStateClass = this.getStateClass(nextState);
 
         if (currentStateClass !== '') {
-            this.inputDisplay.classList.remove(currentStateClass)
-            this.label.classList.remove(currentStateClass)
+            this.inputDisplay.classList.remove(currentStateClass);
+            this.label.classList.remove(currentStateClass);
         }
 
         if (nextStateClass !== '') {
-            this.inputDisplay.classList.add(nextStateClass)
-            this.label.classList.add(nextStateClass)
+            this.inputDisplay.classList.add(nextStateClass);
+            this.label.classList.add(nextStateClass);
         }
 
         this.state = nextState;
@@ -112,14 +112,14 @@ export default class InputDisplay {
     private getStateClass(state: State): string {
         switch (state) {
             case State.OK:
-                return 'ok'
+                return 'ok';
             case State.WARNING:
-                return 'has-warning'
+                return 'has-warning';
             case State.ERROR:
-                return 'has-error'
+                return 'has-error';
             default:
                 console.log('Tried to get class corresponding to non-existing state:', state);
-                return ''
+                return '';
         }
     }
 

@@ -1,6 +1,6 @@
-//Source: https://en.wikipedia.org/wiki/Tempo
-//Note: Several intervals overlap. Some overlap completely.
-//Sorted in ascending order.
+// Source: https://en.wikipedia.org/wiki/Tempo
+// Note: Several intervals overlap. Some overlap completely.
+// Sorted in ascending order.
 const tempoLabels = [
     {
         range: [0, 24],
@@ -83,9 +83,9 @@ const tempoLabels = [
         label: 'Presto'
     },
     {
-        range: [200, 999], //200 bmp and above. 999 as dummy for infinity.
+        range: [200, 999], // 200 bmp and above. 999 as dummy for infinity.
         label: 'Prestissimo'
     }
-]
+];
 
-export default tempoLabels
+export default tempoLabels;

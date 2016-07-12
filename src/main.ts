@@ -1,6 +1,6 @@
-import MetronomeUi from "./MetronomeUi"
+import MetronomeUi from './MetronomeUi';
 
-//Can use Document.querySelector() instead
+// Can use Document.querySelector() instead
 let ui = new MetronomeUi(<HTMLInputElement>document.getElementById('playPauseBtn'),
     <HTMLInputElement>document.getElementById('tapBtn'),
     <HTMLInputElement>document.getElementById('plussBtn'),

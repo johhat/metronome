@@ -1,7 +1,7 @@
 /**
  * Tapper - a tempo tapper module. The tapper averages consecutive values before resetting after resetAfter milliseconds.
  */
-const resetAfter = 5000; //ms
+const resetAfter = 5000; // ms
 
 export default class Tapper {
 
@@ -14,11 +14,11 @@ export default class Tapper {
 
     tap(): { averageTempo: number, numValuesAveraged: number } {
 
-        clearTimeout(this.timerHandle)
+        clearTimeout(this.timerHandle);
 
         this.timerHandle = setTimeout(() => {
-            this.reset()
-        }, resetAfter)
+            this.reset();
+        }, resetAfter);
 
         if (!this.previousTap) {
             this.previousTap = new Date().getTime();
@@ -32,14 +32,14 @@ export default class Tapper {
         let interval = currentTime - this.previousTap;
         this.previousTap = currentTime;
 
-        this.numValuesAveraged++
+        this.numValuesAveraged++;
 
         // Recursive algorithm for linear averaging
-        this.averageInterval = this.averageInterval + (1 / this.numValuesAveraged) * (interval - this.averageInterval)
+        this.averageInterval = this.averageInterval + (1 / this.numValuesAveraged) * (interval - this.averageInterval);
 
         let bpm = 1000 * 60.0 / this.averageInterval;
 
-        //Return value rounded to two decimals
+        // Return value rounded to two decimals
         return {
             averageTempo: Math.round(bpm * 100) / 100,
             numValuesAveraged: this.numValuesAveraged

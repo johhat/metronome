@@ -1,19 +1,19 @@
 /**
  * Metronome
  */
-const minTempo = 40;//BPM
-const maxTempo = 250;//BPM
+const minTempo = 40; // BPM
+const maxTempo = 250; // BPM
 const numBeatsPerBar = 4;
 
-const noteLength = 0.05;//Seconds
-const scheduleInterval = 25.0;//ms. How often the scheduling is called.
-const scheduleAheadTime = 0.1;//Seconds
+const noteLength = 0.05; // Seconds
+const scheduleInterval = 25.0; // ms. How often the scheduling is called.
+const scheduleAheadTime = 0.1; // Seconds
 
 enum Pitch { HIGH, MID, LOW };
 
 export default class Metronome {
 
-    private tempo: number; //beats per minute (BPM)
+    private tempo: number; // beats per minute (BPM)
     private isPlaying: boolean = false;
     private currentBeat: number = 0;
     private audioContext: AudioContext;
@@ -30,21 +30,21 @@ export default class Metronome {
     private next4thNote: number = 0;
 
     constructor(tempo: number) {
-        //Safari needs prefix webkitAudioContext
-        this.audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)()
+        // Safari needs prefix webkitAudioContext
+        this.audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)();
         this.setTempo(tempo);
 
         // --Suspend/resume--
         this.canSuspend = (() => {
             if (typeof (<any>this.audioContext).resume !== 'function') {
-                return false
+                return false;
             }
 
             if (typeof (<any>this.audioContext).suspend !== 'function') {
-                return false
+                return false;
             }
-            return true
-        })()
+            return true;
+        })();
 
         if (this.canSuspend) {
             clearTimeout(this.suspendTimerId);
@@ -52,7 +52,7 @@ export default class Metronome {
         }
 
         // --Web worker--
-        this.usesWorker = (<any>window).Worker ? true : false
+        this.usesWorker = (<any>window).Worker ? true : false;
 
         if (this.usesWorker) {
             this.intervalWorker = new Worker('build/IntervalWorker.js');
@@ -63,7 +63,7 @@ export default class Metronome {
                 } else {
                     console.log('Data from intervalWorker: ', event.data);
                 }
-            }
+            };
         }
     }
 
@@ -83,7 +83,7 @@ export default class Metronome {
             if (this.canSuspend) {
                 this.suspendTimerId = setTimeout(() => {
                     (<any>this.audioContext).suspend();
-                }, scheduleAheadTime * 1000 * 2)
+                }, scheduleAheadTime * 1000 * 2);
             }
         }
     }
@@ -99,19 +99,19 @@ export default class Metronome {
 
     validateTempo(tempo: number): { valid: boolean, error: string } {
         if (isNaN(tempo)) {
-            //Change to error state
+            // Change to error state
             return { valid: false, error: 'You must enter a number' };
         }
 
         tempo = Number(tempo);
 
         if (tempo < minTempo) {
-            //Signal error
+            // Signal error
             return { valid: false, error: 'Minimum tempo is ' + minTempo };
         }
 
         if (tempo > maxTempo) {
-            //Signal error
+            // Signal error
             return { valid: false, error: 'Max tempo is ' + maxTempo };
         }
 
@@ -121,11 +121,11 @@ export default class Metronome {
     setTempo(tempo: number): void {
 
         if (this.tempo === tempo) {
-            //Do nothing if it is the same
+            // Do nothing if it is the same
             return;
         }
 
-        let {valid} = this.validateTempo(tempo)
+        let {valid} = this.validateTempo(tempo);
 
         if (!valid) {
             return;
@@ -135,18 +135,18 @@ export default class Metronome {
     }
 
     getMinTempo() {
-        return minTempo
+        return minTempo;
     }
 
     getMaxTempo() {
-        return maxTempo
+        return maxTempo;
     }
 
     private stopAudioLoop() {
         if (this.usesWorker) {
             this.intervalWorker.postMessage({ 'interval': 0 });
         } else {
-            clearInterval(this.audioLoopTimerHandle)
+            clearInterval(this.audioLoopTimerHandle);
         }
     }
 
@@ -159,9 +159,9 @@ export default class Metronome {
             this.intervalWorker.postMessage({ 'interval': scheduleInterval });
         } else {
             this.audioLoopTimerHandle = setInterval(() => {
-                if (!this.isPlaying) return
-                this.scheduler()
-            }, scheduleInterval)
+                if (!this.isPlaying) return;
+                this.scheduler();
+            }, scheduleInterval);
         }
     }
 
@@ -192,7 +192,7 @@ export default class Metronome {
                 frequency = 220;
                 break;
             default:
-                console.log('Invalid pitch')
+                console.log('Invalid pitch');
                 frequency = 220;
                 break;
         }
