@@ -115,6 +115,14 @@ export default class Metronome {
         console.log('New metronome tempo:', tempo);
     }
 
+    getMinTempo() {
+        return minTempo
+    }
+
+    getMaxTempo() {
+        return maxTempo
+    }
+
     private stopAudioLoop() {
         clearInterval(this.audioLoopTimerHandle)
     }

@@ -9,10 +9,6 @@ import InputDisplay from './InputDisplay'
 const defaultTempo = 120; //BPM
 const defaultHelpText = 'Tempo in beats per minute (BPM):'
 
-//These should be imported from Metronome module
-const minTempo = 40;
-const maxTempo = 250;
-
 let hasLocalStorage = (() => {
     let test = 'metronome-test-string';
     try {
@@ -38,6 +34,9 @@ export default class MetronomeUi {
     private metronome: Metronome;
     private tapper: Tapper
 
+    private minTempo : number
+    private maxTempo : number
+
     private plussBtn: WhilePressedBtn;
     private minusBtn: WhilePressedBtn;
     private inputDisplay: InputDisplay;
@@ -51,6 +50,10 @@ export default class MetronomeUi {
         inputDisplayLabel: HTMLLabelElement) {
 
         this.metronome = new Metronome(defaultTempo);
+
+        this.minTempo = this.metronome.getMinTempo();
+        this.maxTempo = this.metronome.getMaxTempo();
+
         this.tapper = new Tapper();
 
         this.plussBtn = new WhilePressedBtn(plussBtn, () => { this.incrementDisplayValue() });
@@ -113,8 +116,8 @@ export default class MetronomeUi {
         let {valid, error} = this.metronome.validateTempo(newValue)
 
         if (!valid) {
-            if (newValue > maxTempo) this.setDisplayValue(maxTempo)
-            if (newValue < minTempo) this.setDisplayValue(minTempo)
+            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo)
+            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo)
             this.inputDisplay.setTimedError(error, 2000)
             this.plussBtn.setTimedError(2000)
             return;
@@ -129,8 +132,8 @@ export default class MetronomeUi {
         let {valid, error} = this.metronome.validateTempo(newValue)
 
         if (!valid) {
-            if (newValue < minTempo) this.setDisplayValue(minTempo)
-            if (newValue > maxTempo) this.setDisplayValue(maxTempo)
+            if (newValue < this.minTempo) this.setDisplayValue(this.minTempo)
+            if (newValue > this.maxTempo) this.setDisplayValue(this.maxTempo)
             this.inputDisplay.setTimedError(error, 2000)
             this.minusBtn.setTimedError(2000)
             return;
