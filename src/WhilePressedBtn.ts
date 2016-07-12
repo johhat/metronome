@@ -27,12 +27,31 @@ export default class WhilePressedBtn {
             this.mouseDownTimerHandle = setTimeout(() => { this.mouseDownLoop() }, keyDownRepeatDelay);
         });
 
+        this.btn.addEventListener('touchstart', (event) => {
+            event.preventDefault()
+            this.btn.focus() //TODO: Check problem in chrome iPhone emulator where hover is not removed from previously focused element. Known as the sticky hover problem.
+            this.mouseIsPressed = true;
+            this.mouseDownHandlerFunction();
+            this.mouseDownTimerHandle = setTimeout(() => { this.mouseDownLoop() }, keyDownRepeatDelay);
+        });
+
         //Add mouseup eventlistener to document in case the mouse is moved away from btn before it is released.
         document.addEventListener('mouseup', (event) => {
             if (event.which !== MouseCodes.LEFT) return;
             this.mouseIsPressed = false;
             clearTimeout(this.mouseDownTimerHandle);
         });
+
+        //End of touch events
+        this.btn.addEventListener('touchend', (event) => {
+            this.mouseIsPressed = false;
+            clearTimeout(this.mouseDownTimerHandle);
+        })
+
+        this.btn.addEventListener('touchcancel', (event) => {
+            this.mouseIsPressed = false;
+            clearTimeout(this.mouseDownTimerHandle);
+        })
     }
 
     setTimedError(duration: number): void {
