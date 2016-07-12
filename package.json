@@ -17,6 +17,7 @@
     "browser-sync": "^2.13.0",
     "browserify": "^13.0.1",
     "tsify": "^0.16.0",
+    "tslint": "^3.13.0",
     "watchify": "^3.7.0"
   },
   "dependencies": {
