@@ -153,12 +153,12 @@ export default class MetronomeUi {
     private handleKeyDown(event: KeyboardEvent): void {
         const keyName = event.key;
 
-        if (keyName === 'ArrowUp' || keyName === 'ArrowRight') {
+        if (keyName === 'ArrowUp') {
             event.preventDefault();
             this.incrementDisplayValue();
         }
 
-        if (keyName === 'ArrowDown' || keyName === 'ArrowLeft') {
+        if (keyName === 'ArrowDown') {
             event.preventDefault();
             this.decrementDisplayValue();
         }
