@@ -18,15 +18,23 @@ export default class Metronome {
     private currentBeat: number = 0;
     private audioContext: AudioContext;
     private audioLoopTimerHandle: number;
-    
+
     private canSuspend: boolean = false;
-    private suspendTimerId : number = 0;
+
+    private usesWorker: boolean = false;
+    private intervalWorker: Worker;
+
+    private suspendTimerId: number = 0;
+
+    private nextNoteTime: number = 0;
+    private next4thNote: number = 0;
 
     constructor(tempo: number) {
         //Safari needs prefix webkitAudioContext
         this.audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)()
         this.setTempo(tempo);
 
+        // --Suspend/resume--
         this.canSuspend = (() => {
             if (typeof (<any>this.audioContext).resume !== 'function') {
                 return false
@@ -42,6 +50,21 @@ export default class Metronome {
             clearTimeout(this.suspendTimerId);
             (<any>this.audioContext).suspend();
         }
+
+        // --Web worker--
+        this.usesWorker = (<any>window).Worker ? true : false
+
+        if (this.usesWorker) {
+            this.intervalWorker = new Worker('build/IntervalWorker.js');
+
+            this.intervalWorker.onmessage = (event) => {
+                if (event.data === 'tick') {
+                    this.scheduler();
+                } else {
+                    console.log('Data from intervalWorker: ', event.data);
+                }
+            }
+        }
     }
 
     play(): void {
@@ -56,7 +79,7 @@ export default class Metronome {
         if (this.isPlaying) {
             this.stopAudioLoop();
             this.isPlaying = false;
-            
+
             if (this.canSuspend) {
                 this.suspendTimerId = setTimeout(() => {
                     (<any>this.audioContext).suspend();
@@ -124,31 +147,35 @@ export default class Metronome {
     }
 
     private stopAudioLoop() {
-        clearInterval(this.audioLoopTimerHandle)
+        if (this.usesWorker) {
+            this.intervalWorker.postMessage({ 'interval': 0 });
+        } else {
+            clearInterval(this.audioLoopTimerHandle)
+        }
     }
 
     private audioLoop() {
 
-        let nextNoteTime = this.audioContext.currentTime + 0.1;
-        let next4thNote = 0;
+        this.nextNoteTime = this.audioContext.currentTime + 0.1;
+        this.next4thNote = 0;
 
-        //The scheduler
-        this.audioLoopTimerHandle = setInterval(() => {
+        if (this.usesWorker) {
+            this.intervalWorker.postMessage({ 'interval': scheduleInterval });
+        } else {
+            this.audioLoopTimerHandle = setInterval(() => {
+                if (!this.isPlaying) return
+                this.scheduler()
+            }, scheduleInterval)
+        }
+    }
 
-            if (!this.isPlaying) {
-                return;
-            }
-
-            while (nextNoteTime < this.audioContext.currentTime + scheduleAheadTime) {
-
-                this.scheduleTone(nextNoteTime, next4thNote % numBeatsPerBar ? Pitch.MID : Pitch.HIGH);
-
-                let secondsPerBeat = 60.0 / this.tempo;
-                nextNoteTime += secondsPerBeat;
-                next4thNote = (next4thNote + 1) % numBeatsPerBar;
-            }
-
-        }, scheduleInterval)
+    private scheduler() {
+        while (this.nextNoteTime < this.audioContext.currentTime + scheduleAheadTime) {
+            this.scheduleTone(this.nextNoteTime, this.next4thNote % numBeatsPerBar ? Pitch.MID : Pitch.HIGH);
+            let secondsPerBeat = 60.0 / this.tempo;
+            this.nextNoteTime += secondsPerBeat;
+            this.next4thNote = (this.next4thNote + 1) % numBeatsPerBar;
+        }
     }
 
     private scheduleTone(startTime: number, pitch: Pitch): void {

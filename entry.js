@@ -25,6 +25,11 @@ browserSync.init({
 //Browser sync watching of non-ts-files
 browserSync.watch('index.html').on('change', browserSync.reload)
 browserSync.watch('css/*.css').on('change', browserSync.reload)
+browserSync.watch('src/IntervalWorker.js').on('change', () => {
+  copyFile('src/IntervalWorker.js', 'build/IntervalWorker.js', (error) => {
+    browserSync.reload('src/IntervalWorker.js');
+  })
+})
 
 //Bundling and reloading on bundling - fn triggered automatically on change in .ts-files due to watchify+tsify plugins
 function bundle() {
@@ -44,23 +49,26 @@ browserifyInstance.on('update', bundle)
 bundle()
 
 //Copy files from node modules
-copyFile('node_modules/normalize.css/normalize.css','css/normalize.css',(error)=>{})
+copyFile('node_modules/normalize.css/normalize.css', 'css/normalize.css', (error) => { })
+
+//Copy js files
+copyFile('src/IntervalWorker.js', 'build/IntervalWorker.js', (error) => { })
 
 //Utility functions below here
 function copyFile(source, target, cb) {
   var cbCalled = false;
 
   var rd = fs.createReadStream(source);
-  rd.on("error", function(err) {
-    console.log('Error during copy. Read stream.',err.toString())
+  rd.on("error", function (err) {
+    console.log('Error during copy. Read stream.', err.toString())
     done(err);
   });
   var wr = fs.createWriteStream(target);
-  wr.on("error", function(err) {
-    console.log('Error during copy. Write stream.',err.toString())
+  wr.on("error", function (err) {
+    console.log('Error during copy. Write stream.', err.toString())
     done(err);
   });
-  wr.on("close", function(ex) {
+  wr.on("close", function (ex) {
     console.log('Copy of', source, 'completed')
     done();
   });
