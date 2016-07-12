@@ -18,15 +18,35 @@ export default class Metronome {
     private currentBeat: number = 0;
     private audioContext: AudioContext;
     private audioLoopTimerHandle: number;
+    
+    private canSuspend: boolean = false;
+    private suspendTimerId : number = 0;
 
     constructor(tempo: number) {
         //Safari needs prefix webkitAudioContext
         this.audioContext = new ((<any>window).AudioContext || (<any>window).webkitAudioContext)()
         this.setTempo(tempo);
+
+        this.canSuspend = (() => {
+            if (typeof (<any>this.audioContext).resume !== 'function') {
+                return false
+            }
+
+            if (typeof (<any>this.audioContext).suspend !== 'function') {
+                return false
+            }
+            return true
+        })()
+
+        if (this.canSuspend) {
+            clearTimeout(this.suspendTimerId);
+            (<any>this.audioContext).suspend();
+        }
     }
 
     play(): void {
         if (!this.isPlaying) {
+            if (this.canSuspend) (<any>this.audioContext).resume();
             this.isPlaying = true;
             this.audioLoop();
         }
@@ -36,6 +56,12 @@ export default class Metronome {
         if (this.isPlaying) {
             this.stopAudioLoop();
             this.isPlaying = false;
+            
+            if (this.canSuspend) {
+                this.suspendTimerId = setTimeout(() => {
+                    (<any>this.audioContext).suspend();
+                }, scheduleAheadTime * 1000 * 2)
+            }
         }
     }
 
@@ -95,7 +121,7 @@ export default class Metronome {
 
     private audioLoop() {
 
-        let nextNoteTime = this.audioContext.currentTime;
+        let nextNoteTime = this.audioContext.currentTime + 0.1;
         let next4thNote = 0;
 
         //The scheduler
