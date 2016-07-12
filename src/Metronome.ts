@@ -107,13 +107,11 @@ export default class Metronome {
 
         if (tempo < minTempo) {
             //Signal error
-            console.log('Below min tempo')
             return { valid: false, error: 'Minimum tempo is ' + minTempo };
         }
 
         if (tempo > maxTempo) {
             //Signal error
-            console.log('Above max tempo')
             return { valid: false, error: 'Max tempo is ' + maxTempo };
         }
 
@@ -134,8 +132,6 @@ export default class Metronome {
         }
 
         this.tempo = Number(tempo);
-
-        console.log('New metronome tempo:', tempo);
     }
 
     getMinTempo() {

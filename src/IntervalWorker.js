@@ -9,25 +9,24 @@ self.onmessage = function (event) {
     var interval = event.data.interval;
 
     if (interval === 0) {
-        console.log('INTERVAL-WORKER: Clearing interval')
+        postMessage('Clearing interval');
         clearInterval(intervalId);
         return;
     }
 
     if (!interval || isNaN(interval)) {
-        console.log('INTERVAL-WORKER: Error. Interval not valid. Interval:', interval);
+        postMessage('Error - Interval not valid. Interval: ' + interval);
         return;
     }
 
     interval = Number(interval);
 
     if (interval > 0) {
-        console.log('INTERVAL-WORKER: Setting interval with interval ', interval)
+        postMessage('Setting interval with interval ' + interval);
         intervalId = setInterval(function () {
-            postMessage('tick')
+            postMessage('tick');
         }, interval);
     }
-}
+};
 
-console.log('INTERVAL-WORKER: Interval worker initialized');
 postMessage('Interval worker initialized');
