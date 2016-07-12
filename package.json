@@ -18,11 +18,11 @@
     "browserify": "^13.0.1",
     "tsify": "^0.16.0",
     "tslint": "^3.13.0",
-    "watchify": "^3.7.0"
+    "watchify": "^3.7.0",
+    "typescript": "^1.8.10"
   },
   "dependencies": {
-    "normalize.css": "^4.2.0",
-    "typescript": "^1.8.10"
+    "normalize.css": "^4.2.0"
   },
   "repository": {
     "type": "git",
