@@ -5,6 +5,7 @@ import Metronome from './Metronome';
 import Tapper from './Tapper';
 import WhilePressedBtn from './WhilePressedBtn';
 import InputDisplay from './InputDisplay';
+import MetronomeAnimation from './MetronomeAnimation';
 
 const defaultTempo = 120; // BPM
 const defaultHelpText = 'Tempo in beats per minute (BPM):';
@@ -41,6 +42,8 @@ export default class MetronomeUi {
     private minusBtn: WhilePressedBtn;
     private inputDisplay: InputDisplay;
 
+    private metronomeAnimation: MetronomeAnimation;
+
     constructor(private playPauseBtn: HTMLInputElement,
         private tapBtn: HTMLInputElement,
         plussBtn: HTMLInputElement,
@@ -50,6 +53,12 @@ export default class MetronomeUi {
         inputDisplayLabel: HTMLLabelElement) {
 
         this.metronome = new Metronome(defaultTempo);
+
+        this.metronomeAnimation = new MetronomeAnimation(() => {
+            return this.metronome.getCurrentTime();
+        }, () => {
+            return this.metronome.readNoteQue();
+        });
 
         this.minTempo = this.metronome.getMinTempo();
         this.maxTempo = this.metronome.getMaxTempo();
@@ -107,6 +116,7 @@ export default class MetronomeUi {
 
     private togglePlayPause(): void {
         this.isPlaying = this.metronome.toggle();
+        this.metronomeAnimation.toggle();
     }
 
     private incrementDisplayValue(): void {
@@ -144,7 +154,7 @@ export default class MetronomeUi {
 
     private reset(): void {
         this.setDisplayValue(defaultTempo);
-        this.metronome.pause();
+        if (this.isPlaying) this.togglePlayPause();
         this.metronome.setTempo(defaultTempo);
         this.tapper.reset();
         localStorage.clear();

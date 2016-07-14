@@ -4,6 +4,7 @@
 const minTempo = 40; // BPM
 const maxTempo = 250; // BPM
 const numBeatsPerBar = 4;
+const maxNoteQueLength = 5;
 
 const noteLength = 0.05; // Seconds
 const scheduleInterval = 25.0; // ms. How often the scheduling is called.
@@ -27,6 +28,8 @@ export default class Metronome {
 
     private nextNoteTime: number = 0;
     private next4thNote: number = 0;
+
+    private noteQue: { progress: number, time: number, tempo: number }[];
 
     constructor(tempo: number) {
         // Safari needs prefix webkitAudioContext
@@ -141,18 +144,41 @@ export default class Metronome {
         return maxTempo;
     }
 
+    getCurrentTime() {
+        return this.audioContext.currentTime;
+    }
+
+    readNoteQue(): { progress: number, time: number, tempo: number } {
+        return this.noteQue.pop();
+    }
+
+    private flushNoteQue() {
+        while (this.noteQue.length > 0) {
+            this.noteQue.pop();
+        }
+    }
+
     private stopAudioLoop() {
         if (this.usesWorker) {
             this.intervalWorker.postMessage({ 'interval': 0 });
         } else {
             clearInterval(this.audioLoopTimerHandle);
         }
+        this.flushNoteQue();
     }
 
     private audioLoop() {
 
         this.nextNoteTime = this.audioContext.currentTime + 0.1;
         this.next4thNote = 0;
+
+        this.noteQue = [];
+
+        this.noteQue.push({
+            time: this.nextNoteTime,
+            tempo: this.tempo,
+            progress: this.next4thNote / 4,
+        });
 
         if (this.usesWorker) {
             this.intervalWorker.postMessage({ 'interval': scheduleInterval });
@@ -170,6 +196,14 @@ export default class Metronome {
             let secondsPerBeat = 60.0 / this.tempo;
             this.nextNoteTime += secondsPerBeat;
             this.next4thNote = (this.next4thNote + 1) % numBeatsPerBar;
+
+            if (this.noteQue.length > maxNoteQueLength) this.noteQue.pop();
+
+            this.noteQue.push({
+                time: this.nextNoteTime,
+                tempo: this.tempo,
+                progress: (this.next4thNote ) / 4,
+            });
         }
     }
 

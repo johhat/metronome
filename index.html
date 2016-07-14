@@ -17,6 +17,10 @@
 <body>
     <div class="container">
         <h1 class="center hide">Metronome</h1>
+        <div id="animationContainer">
+            <canvas id="bottom-canvas" moz-opaque></canvas>
+            <canvas id="top-canvas"></canvas>
+        </div>
         <div>
             <label id="inputDisplayLabel" for="inputDisplay" class="help-block">Tempo in beats per minute (BPM):</label>
             <input class="bpm-display" id="inputDisplay" name="inputDisplay" type="number" value="120" min="0" max="300">
