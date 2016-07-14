@@ -8,7 +8,8 @@ Some things worth mentioning are:
 * A web worker is used to get precise timing - with a regular setInterval as fallback.
 * Suspend and resume of AudioContext is done when available. This can potentially save some resources.
 * The canvas animation is synced precisely to the sounds by using the AudioContext current time to time the animation.
-* The main parts are written in typescript.
+* Local storage is used to store and retrieve tempo when available.
+* The main parts of the java script app are written in typescript.
 
 ## Developing
 
