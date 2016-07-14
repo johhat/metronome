@@ -42,7 +42,9 @@ function bundle() {
         })
         .pipe(fs.createWriteStream(outFile));
 
-    browserSync.reload(outFile);
+    setTimeout(() => {
+        browserSync.reload(outFile);// To avoid unexpected end of input error in Chrome
+    }, 1000);
 }
 
 browserifyInstance.on('update', bundle);
