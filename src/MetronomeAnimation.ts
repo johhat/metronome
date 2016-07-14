@@ -15,7 +15,6 @@
     The animation uses a translated coordinate frame where the origin is moved down to the right.
     The y-axis wraps around such that the last 7/8 of a bar are animated as a right-movement from the left edge of the canvas,
     while the first 7/8 are animated as a right movement from the translated origin.
-
  */
 
 const sigma = 0.027;
@@ -130,14 +129,18 @@ export default class MetronomeAnimation {
 
         this.transformToNoteFrame(ctx);
 
-        // Draw the curve
-        for (let barPosition = 0; barPosition < 7 / 8; barPosition += 0.001) {
+        let precision = 0.001;
+
+        // Draw the curve to the right in the note fram
+        for (let barPosition = 0; barPosition < 7 / 8; barPosition += precision) {
             ctx.lineTo(this.getXoffset(barPosition), this.getYoffset(barPosition));
         }
 
+        // Move to the left side of the canvas
         ctx.moveTo(this.getXoffset(7 / 8), this.getYoffset(7 / 8));
 
-        for (let barPosition = 7 / 8; barPosition < 1; barPosition += 0.001) {
+        // Draw the curve to the left in the note fram
+        for (let barPosition = 7 / 8; barPosition < 1; barPosition += precision) {
             ctx.lineTo(this.getXoffset(barPosition), this.getYoffset(barPosition));
         }
 

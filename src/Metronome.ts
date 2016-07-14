@@ -101,19 +101,16 @@ export default class Metronome {
 
     validateTempo(tempo: number): { valid: boolean, error: string } {
         if (isNaN(tempo)) {
-            // Change to error state
             return { valid: false, error: 'You must enter a number' };
         }
 
         tempo = Number(tempo);
 
         if (tempo < minTempo) {
-            // Signal error
             return { valid: false, error: 'Minimum tempo is ' + minTempo };
         }
 
         if (tempo > maxTempo) {
-            // Signal error
             return { valid: false, error: 'Max tempo is ' + maxTempo };
         }
 
