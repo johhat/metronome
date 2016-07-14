@@ -63,7 +63,10 @@ export default class MetronomeUi {
         this.minTempo = this.metronome.getMinTempo();
         this.maxTempo = this.metronome.getMaxTempo();
 
-        this.tapper = new Tapper();
+        this.tapper = new Tapper(() => {
+            // called onReset
+            this.inputDisplay.blinkInfo('Tapper reset.');
+        });
 
         this.plussBtn = new WhilePressedBtn(plussBtn, () => { this.incrementDisplayValue(); });
         this.minusBtn = new WhilePressedBtn(minusBtn, () => { this.decrementDisplayValue(); });
@@ -107,11 +110,12 @@ export default class MetronomeUi {
         let {averageTempo, numValuesAveraged} = this.tapper.tap();
 
         if (numValuesAveraged === 0) {
+            this.inputDisplay.setTimedInfo('Tap one more time to estimate tempo.', 4000);
             return;
         }
 
-        console.log('Num values averaged:', numValuesAveraged);
         this.setDisplayValue(averageTempo);
+        this.inputDisplay.setTimedInfo('Average of ' + numValuesAveraged + ' intervals. The tapper resets after 5 seconds.', 4000);
     }
 
     private togglePlayPause(): void {

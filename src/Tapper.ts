@@ -10,7 +10,7 @@ export default class Tapper {
     private numValuesAveraged: number = 0;
     private timerHandle: number = 0;
 
-    constructor() { }
+    constructor(private onReset: () => void) { }
 
     tap(): { averageTempo: number, numValuesAveraged: number } {
 
@@ -47,8 +47,11 @@ export default class Tapper {
     }
 
     reset(): void {
-        this.previousTap = 0;
-        this.numValuesAveraged = 0;
-        this.averageInterval = 0;
+        if (this.previousTap) {
+            this.previousTap = 0;
+            this.numValuesAveraged = 0;
+            this.averageInterval = 0;
+            this.onReset();
+        }
     }
 }

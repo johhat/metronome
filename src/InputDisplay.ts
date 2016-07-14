@@ -2,7 +2,7 @@
  * InputDisplay
  */
 const inputReactDelay = 500; // ms.
-enum State { OK, WARNING, ERROR }
+enum State { OK, INFO, WARNING, ERROR }
 
 export default class InputDisplay {
 
@@ -37,8 +37,8 @@ export default class InputDisplay {
     setTimedError(message: string, duration: number) {
         clearTimeout(this.messageTimerId);
 
-        this.setState(State.ERROR);
-        this.setErrorMessage(message);
+        this.setState(State.OK);
+        this.setLabelMessage(message);
 
         this.messageTimerId = setTimeout(() => {
             // Go back to state corresponding to current display value
@@ -46,15 +46,49 @@ export default class InputDisplay {
         }, duration);
     }
 
+    setTimedInfo(message: string, duration: number) {
+        clearTimeout(this.messageTimerId);
+
+        this.setState(State.INFO);
+        this.setLabelMessage(message);
+
+        this.messageTimerId = setTimeout(() => {
+            // Go back to state corresponding to current display value
+            this.handleNewValue(this.inputDisplay.value);
+        }, duration);
+    }
+
+    blinkInfo(message: string) {
+        this.setState(State.INFO);
+        this.setLabelMessage(message);
+
+        let blink1Off = 100;
+        let blink2On = 100;
+        let messageTimeout = 1000;
+
+        setTimeout(() => {
+            this.setState(State.OK);
+        }, blink1Off);
+
+        setTimeout(() => {
+            this.setState(State.INFO);
+        }, blink1Off + blink2On);
+
+        this.messageTimerId = setTimeout(() => {
+            // Go back to state corresponding to current display value
+            this.handleNewValue(this.inputDisplay.value);
+        }, blink1Off + blink2On + messageTimeout);
+    }
+
     private handleNewValue(value: string): boolean {
         if (value.toString().length < 2) {
-            this.setErrorMessage('The value must have at least two digits.');
+            this.setLabelMessage('The value must have at least two digits.');
             this.setState(State.WARNING);
             return false;
         }
 
         if (isNaN(Number(value))) {
-            this.setErrorMessage('The entered value is not a number. Please enter a number');
+            this.setLabelMessage('The entered value is not a number. Please enter a number');
             this.setState(State.WARNING);
             return false;
         }
@@ -64,13 +98,13 @@ export default class InputDisplay {
         let {valid, error} = this.validator(valueAsNumber);
 
         if (!valid) {
-            this.setErrorMessage(error);
+            this.setLabelMessage(error);
             this.setState(State.ERROR);
             return false;
         }
 
         this.setState(State.OK);
-        this.setErrorMessage(this.defaultHelpText);
+        this.setLabelMessage(this.defaultHelpText);
 
         return true;
     }
@@ -113,6 +147,8 @@ export default class InputDisplay {
         switch (state) {
             case State.OK:
                 return 'ok';
+            case State.INFO:
+                return 'has-info';
             case State.WARNING:
                 return 'has-warning';
             case State.ERROR:
@@ -123,7 +159,7 @@ export default class InputDisplay {
         }
     }
 
-    private setErrorMessage(message: string): void {
+    private setLabelMessage(message: string): void {
         this.label.textContent = message;
     }
 }

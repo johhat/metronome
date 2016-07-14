@@ -179,6 +179,10 @@ label.has-warning {
     font-weight: 700;
 }
 
+label.has-info {
+    color: #193B4C;
+    font-weight: 700;
+}
 
 input.ok:focus,
 input.ok:hover {
@@ -213,6 +217,11 @@ input.has-error:hover {
     box-shadow: inset 0 1px 1px rgba(0,0,0,.075),0 0 6px #ce8483;
     background-color: transparent;
     outline: none;
+}
+
+input.has-info {
+    border-color: #193B4C;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,.075);    
 }
 
 .info-text {
