@@ -1,6 +1,15 @@
 ## Live demo
 Please follow [this link][live-demo].
 
+## Stuff used
+Some things worth mentioning are:
+
+* AudioContext is used to make and play sounds.
+* A web worker is used to get precise timing - with a regular setInterval as fallback.
+* Suspend and resume of AudioContext is done when available. This can potentially save some resources.
+* The canvas animation is synced precisely to the sounds by using the AudioContext current time to time the animation.
+* The main parts are written in typescript.
+
 ## Developing
 
 After cloning the repo run 
